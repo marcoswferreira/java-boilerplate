@@ -1,0 +1,43 @@
+# ── Build artifacts ──────────────────────────────────────────
+target/
+*.jar
+*.war
+*.class
+
+# ── Maven ────────────────────────────────────────────────────
+.mvn/repository/
+!.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# ── IDE ──────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.eclipse/
+.project
+.classpath
+.settings/
+*.code-workspace
+.vscode/
+
+# ── Secrets (NEVER commit) ───────────────────────────────────
+.env
+*.env
+*.pem
+*.key
+k8s/secret.yaml.local
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Docker ───────────────────────────────────────────────────
+docker/postgres_data/
+docker/redis_data/

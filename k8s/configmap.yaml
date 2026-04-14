@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: boilerplate-config
+data:
+  DB_URL: "jdbc:postgresql://postgres-service:5432/boilerplate"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka-service:9092"
+  KAFKA_CONSUMER_GROUP: "boilerplate-api"
+  HIKARI_MAX_POOL_SIZE: "10"
+  HIKARI_CONNECTION_TIMEOUT_MS: "30000"
+  OUTBOX_RELAY_INTERVAL_MS: "5000"
+  JWT_ACCESS_TOKEN_TTL_MS: "900000"
+  JWT_REFRESH_TOKEN_TTL_MS: "604800000"
