@@ -2,6 +2,8 @@ package com.boilerplate;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -12,6 +14,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * Boilerplate API — Spring Boot entry point.
  *
  * <p>This is the composition root. All application modules are assembled here.
+ *
+ * <p>{@link DataSourceAutoConfiguration} is excluded because we register a custom
+ * {@link com.boilerplate.infrastructure.tenant.TenantAwareDataSource} as the primary DataSource.
+ * {@link FlywayAutoConfiguration} is excluded because Flyway is configured manually via
+ * {@link com.boilerplate.infrastructure.persistence.config.FlywayTenantMigrationConfig}.
  */
 @SpringBootApplication(
     scanBasePackages = {
@@ -19,7 +26,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
       "com.boilerplate.infrastructure",
       "com.boilerplate.web",
       "com.boilerplate.bootstrap"
-    })
+    },
+    exclude = {DataSourceAutoConfiguration.class, FlywayAutoConfiguration.class})
 @EnableJpaAuditing
 @EnableAsync
 @EnableScheduling

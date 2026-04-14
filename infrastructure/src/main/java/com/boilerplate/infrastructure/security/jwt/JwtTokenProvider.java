@@ -92,6 +92,7 @@ public class JwtTokenProvider implements JwtTokenService {
     return parseToken(token).map(c -> UUID.fromString(c.getSubject()));
   }
 
+  @Override
   public Optional<String> extractTenantId(String token) {
     return parseToken(token).map(c -> c.get(CLAIM_TENANT_ID, String.class));
   }
@@ -103,7 +104,12 @@ public class JwtTokenProvider implements JwtTokenService {
         .orElse(List.of());
   }
 
-  public boolean isTokenValid(String token) {
+  @Override
+  public boolean isValid(String token) {
     return parseToken(token).isPresent();
+  }
+
+  public boolean isTokenValid(String token) {
+    return isValid(token);
   }
 }

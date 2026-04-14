@@ -1,6 +1,6 @@
-package com.boilerplate.web.filter;
+package com.boilerplate.bootstrap.config;
 
-import com.boilerplate.infrastructure.security.jwt.JwtTokenProvider;
+import com.boilerplate.application.auth.JwtTokenService;
 import com.boilerplate.infrastructure.tenant.TenantContextHolder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,6 +24,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *   <li>HTTP subdomain (e.g. {@code tenant1.api.company.com})
  * </ol>
  *
+ * <p>Lives in the {@code bootstrap} module because it depends on both
+ * {@code application} ({@link JwtTokenService}) and {@code infrastructure}
+ * ({@link TenantContextHolder}).
+ *
  * <p>Always clears the {@link TenantContextHolder} in a {@code finally} block.
  */
 @Component
@@ -35,10 +39,10 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
   private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String BEARER_PREFIX = "Bearer ";
 
-  private final JwtTokenProvider jwtTokenProvider;
+  private final JwtTokenService jwtTokenService;
 
-  public TenantResolutionFilter(JwtTokenProvider jwtTokenProvider) {
-    this.jwtTokenProvider = jwtTokenProvider;
+  public TenantResolutionFilter(JwtTokenService jwtTokenService) {
+    this.jwtTokenService = jwtTokenService;
   }
 
   @Override
@@ -78,7 +82,7 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
     String authHeader = request.getHeader(AUTHORIZATION_HEADER);
     if (StringUtils.hasText(authHeader) && authHeader.startsWith(BEARER_PREFIX)) {
       String token = authHeader.substring(BEARER_PREFIX.length());
-      return jwtTokenProvider.extractTenantId(token).orElse(null);
+      return jwtTokenService.extractTenantId(token).orElse(null);
     }
     return null;
   }
@@ -87,7 +91,6 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
     String host = request.getServerName();
     if (host != null && host.contains(".")) {
       String subdomain = host.split("\\.")[0];
-      // Exclude well-known non-tenant subdomains
       if (!subdomain.isEmpty() && !subdomain.equals("www") && !subdomain.equals("api")) {
         return subdomain;
       }

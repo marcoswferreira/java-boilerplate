@@ -18,7 +18,7 @@ public class TenantJpaEntity extends BaseEntity {
   @Column(name = "active", nullable = false)
   private boolean active;
 
-  protected TenantJpaEntity() {}
+  public TenantJpaEntity() {}
 
   public String getName() {
     return name;

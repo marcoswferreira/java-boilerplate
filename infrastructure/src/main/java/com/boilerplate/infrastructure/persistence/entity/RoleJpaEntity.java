@@ -31,7 +31,7 @@ public class RoleJpaEntity extends BaseEntity {
   @JoinColumn(name = "role_id")
   private Set<PermissionJpaEntity> permissions = new HashSet<>();
 
-  protected RoleJpaEntity() {}
+  public RoleJpaEntity() {}
 
   public String getName() {
     return name;

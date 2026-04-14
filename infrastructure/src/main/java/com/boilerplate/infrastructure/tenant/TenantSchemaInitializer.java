@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,9 @@ import org.springframework.stereotype.Component;
  *   <li>Registers a {@link DataSource} with the appropriate {@code search_path}.
  *   <li>Wires all tenant data sources into the {@link TenantAwareDataSource} lookup map.
  * </ol>
+ *
+ * <p>{@code @Lazy} on TenantRepository breaks the potential circular dependency:
+ * DataSource → JPA → TenantRepository → TenantSchemaInitializer → DataSource.
  */
 @Component
 public class TenantSchemaInitializer implements SmartInitializingSingleton {
@@ -35,7 +39,7 @@ public class TenantSchemaInitializer implements SmartInitializingSingleton {
   private final DataSourceProperties dataSourceProperties;
 
   public TenantSchemaInitializer(
-      TenantRepository tenantRepository,
+      @Lazy TenantRepository tenantRepository,
       TenantAwareDataSource tenantAwareDataSource,
       DataSourceProperties dataSourceProperties) {
     this.tenantRepository = tenantRepository;
@@ -45,7 +49,14 @@ public class TenantSchemaInitializer implements SmartInitializingSingleton {
 
   @Override
   public void afterSingletonsInstantiated() {
-    List<Tenant> tenants = tenantRepository.findAllActive();
+    List<Tenant> tenants;
+    try {
+      tenants = tenantRepository.findAllActive();
+    } catch (Exception e) {
+      log.warn("Could not load tenants at startup (empty database?): {}", e.getMessage());
+      tenants = List.of();
+    }
+
     log.info("Initializing {} tenant schemas", tenants.size());
 
     Map<Object, Object> targetDataSources = new HashMap<>();
@@ -79,7 +90,13 @@ public class TenantSchemaInitializer implements SmartInitializingSingleton {
   private DataSource buildDataSource(String schema) {
     var ds = new DriverManagerDataSource();
     ds.setDriverClassName("org.postgresql.Driver");
-    ds.setUrl(dataSourceProperties.getUrl() + "?currentSchema=" + schema);
+    // Build URL with currentSchema — handle existing query params gracefully
+    String baseUrl = dataSourceProperties.getUrl();
+    String url =
+        baseUrl.contains("?")
+            ? baseUrl + "&currentSchema=" + schema
+            : baseUrl + "?currentSchema=" + schema;
+    ds.setUrl(url);
     ds.setUsername(dataSourceProperties.getUsername());
     ds.setPassword(dataSourceProperties.getPassword());
     return ds;

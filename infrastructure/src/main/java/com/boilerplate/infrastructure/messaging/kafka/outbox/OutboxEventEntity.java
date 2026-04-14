@@ -47,7 +47,7 @@ public class OutboxEventEntity extends BaseEntity {
   @Column(name = "error_message", columnDefinition = "TEXT")
   private String errorMessage;
 
-  protected OutboxEventEntity() {}
+  public OutboxEventEntity() {}
 
   public String getEventType() {
     return eventType;

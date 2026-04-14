@@ -15,7 +15,7 @@ public class PermissionJpaEntity extends BaseEntity {
   @Column(name = "action", nullable = false, length = 100)
   private String action;
 
-  protected PermissionJpaEntity() {}
+  public PermissionJpaEntity() {}
 
   public String getResource() {
     return resource;

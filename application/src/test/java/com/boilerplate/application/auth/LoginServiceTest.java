@@ -95,7 +95,7 @@ class LoginServiceTest {
     mockUser.deactivate();
     when(userRepository.findByEmailAndTenantId("user@test.com", tenantId))
         .thenReturn(Optional.of(mockUser));
-    when(passwordEncoder.matches(any(), any())).thenReturn(true);
+    // Note: passwordEncoder.matches is NOT called — inactive check happens first
 
     assertThatThrownBy(() ->
         sut.execute(new LoginUseCase.LoginCommand("user@test.com", "pw", tenantId.toString())))

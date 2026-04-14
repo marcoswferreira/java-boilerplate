@@ -1,7 +1,5 @@
 package com.boilerplate.infrastructure.persistence.config;
 
-import com.boilerplate.infrastructure.tenant.TenantAwareDataSource;
-import com.boilerplate.infrastructure.tenant.TenantContextHolder;
 import com.boilerplate.core.domain.Tenant;
 import com.boilerplate.core.port.out.TenantRepository;
 import java.util.List;
@@ -9,7 +7,6 @@ import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ public class OutboxRelay {
   public OutboxRelay(
       OutboxEventRepository outboxEventRepository,
       KafkaTemplate<String, String> kafkaTemplate,
-      TenantRepository tenantRepository) {
+      @Lazy TenantRepository tenantRepository) {
     this.outboxEventRepository = outboxEventRepository;
     this.kafkaTemplate = kafkaTemplate;
     this.tenantRepository = tenantRepository;

@@ -36,7 +36,7 @@ public class UserJpaEntity extends BaseEntity {
       inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<RoleJpaEntity> roles = new HashSet<>();
 
-  protected UserJpaEntity() {}
+  public UserJpaEntity() {}
 
   public String getEmail() {
     return email;

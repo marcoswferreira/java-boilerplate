@@ -35,12 +35,21 @@ public class LoginService implements LoginUseCase {
   @Override
   @Transactional(readOnly = true)
   public TokenPair execute(LoginCommand command) {
-    var tenantId = UUID.fromString(command.tenantId());
-
-    User user =
-        userRepository
-            .findByEmailAndTenantId(command.email(), tenantId)
-            .orElseThrow(() -> new EntityNotFoundException("User", command.email()));
+    // tenantId in the command may be a UUID string or schema name.
+    // Users are looked up by email; for tenant filtering we compare the stored UUID.
+    // If the caller passes a schema name instead of UUID, we do a plain email lookup.
+    User user;
+    try {
+      var tenantId = UUID.fromString(command.tenantId());
+      user = userRepository
+          .findByEmailAndTenantId(command.email(), tenantId)
+          .orElseThrow(() -> new EntityNotFoundException("User", command.email()));
+    } catch (IllegalArgumentException e) {
+      // tenantId is a schema name — fall back to email-only lookup
+      user = userRepository
+          .findByEmail(command.email())
+          .orElseThrow(() -> new EntityNotFoundException("User", command.email()));
+    }
 
     if (!user.isActive()) {
       throw new BusinessRuleViolationException("AUTH_USER_INACTIVE", "User account is inactive");
